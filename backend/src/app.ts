@@ -2,9 +2,9 @@ import express,{Request,Response} from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv'
-import authRouter from '../src/router/auth/authRouter'
-import userRouter from '../src/router/user/userRouter'
-import organizerRouter from '../src/router/organizer/organizerRouter'
+import authRouter from './router/auth/authRouter'
+import userRouter from './router/user/userRouter'
+import organizerRouter from './router/organizer/organizerRouter'
 import connectDB from './config/dbConfig';
 
 dotenv.config()
