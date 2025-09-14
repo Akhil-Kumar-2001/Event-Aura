@@ -24,16 +24,16 @@ class AuthController implements IAuthController {
                         httpOnly: true,
                         secure: true,
                         sameSite: "none",
-                        // domain: ".elevic.site",
-                        // path: "/",
+                        domain: ".event-aura-ten.vercel.app",
+                        path: "/",
                         maxAge: 2 * 24 * 60 * 60 * 1000,
                     });
                     res.cookie("accessToken", accessToken, {
                         httpOnly: true,
                         secure: true,
                         sameSite: "none",
-                        // domain: ".elevic.site",
-                        // path: "/",
+                        domain: ".event-aura-ten.vercel.app",
+                        path: "/",
                         maxAge: 15 * 60 * 1000,
                     });
                     res
@@ -77,16 +77,16 @@ class AuthController implements IAuthController {
                         httpOnly: true,
                         secure: true,
                         sameSite: "none",
-                        // domain: ".elevic.site",
-                        // path: "/",
+                        domain: ".event-aura-ten.vercel.app",
+                        path: "/",
                         maxAge: 2 * 24 * 60 * 60 * 1000,
                     });
                     res.cookie("accessToken", accessToken, {
                         httpOnly: true,
                         secure: true,
                         sameSite: "none",
-                        // domain: ".elevic.site",
-                        // path: "/",
+                        domain: ".event-aura-ten.vercel.app",
+                        path: "/",
                         maxAge: 15 * 60 * 1000,
                     });
                     res
@@ -131,11 +131,15 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: true,
                 sameSite: "none",
+                domain: ".event-aura-ten.vercel.app",
+                path: "/",
             });
             res.clearCookie("refreshToken", {
                 httpOnly: true,
                 secure: true,
                 sameSite: "none",
+                domain: ".event-aura-ten.vercel.app",
+                path: "/",
             });
 
             res.status(STATUS_CODES.OK).json({

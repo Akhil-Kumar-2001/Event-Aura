@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AppError } from "../../../utils/customError";
 import { STATUS_CODES } from "../../../constants/statusCode";
-import IUserController from "../../user/interface/IUserController";
+import IUserController from "../interface/IUserController";
 import IUserService from "../../../service/user/interface/IUserService";
 
 class UserController implements IUserController {
