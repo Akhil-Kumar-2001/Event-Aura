@@ -14,7 +14,6 @@ class AuthController implements IAuthController {
     async signup(req: Request, res: Response): Promise<void> {
         try {
             const { username, email, password, role } = req.body;
-            console.log(req.body);
             const signupResponse = await this._authService.sigup(username, email, password, role);
             console.log(signupResponse);
             if (signupResponse) {
@@ -121,11 +120,6 @@ class AuthController implements IAuthController {
 
     async logout(req: Request, res: Response): Promise<void> {
         try {
-            const refreshToken = req.cookies.refreshToken;
-            if (!refreshToken) {
-                res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: "No session found" });
-                return;
-            }
 
             res.clearCookie("accessToken", {
                 httpOnly: true,
