@@ -38,7 +38,6 @@ export default function EventDetailsPage() {
       alert('Please log in to purchase tickets')
       return
     }
-    console.log("iam in parent with evetn",event)
     navigate(`/event/${event._id}/checkout`)
   }
 

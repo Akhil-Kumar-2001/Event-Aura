@@ -33,9 +33,6 @@ class AuthService implements IAuthService {
                     throw new AppError("User ID or role is missing.", STATUS_CODES.BAD_REQUEST);
                 }
                 const { accessToken, refreshToken } = tokenInstance.generatingTokens(newUser._id as string, newUser.role as string);
-                console.log("Accesstoken : ", accessToken)
-                console.log("Refreshtoken : ", refreshToken)
-                
                 const dto = mapUserToDto(newUser)
                 return { user: dto, accessToken, refreshToken };
             }

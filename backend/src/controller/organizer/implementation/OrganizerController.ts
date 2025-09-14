@@ -51,7 +51,6 @@ class OrganizerController implements IOrganizerController {
 
         } catch (error: unknown) {
             if (error instanceof ZodError) {
-                console.log(error.issues);
 
                 res.status(STATUS_CODES.BAD_REQUEST).json({
                     success: false,
@@ -101,7 +100,6 @@ class OrganizerController implements IOrganizerController {
 
         } catch (error: unknown) {
             if (error instanceof ZodError) {
-                console.log(error.issues);
 
                 res.status(STATUS_CODES.BAD_REQUEST).json({
                     success: false,

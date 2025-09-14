@@ -6,7 +6,6 @@ import { apiClient } from '../axiosInstance';
 
 export const handleAxiosError = (error: unknown) => {
     if (axios.isAxiosError(error)) {
-        console.log("Axios Error:", error.response?.data?.message);
         toast.error(error.response?.data?.message);
     } else {
         console.error("Unexpected error:", error);
@@ -29,7 +28,6 @@ export const getEvents = async () => {
 
 export const purchaseTicket = async (data: any) => {
     try {
-        console.log("I am a foool ////////////////////////////////////////////////////")
         const response = await apiClient.post("/ticket-purchase", { data });
         return response.data;
     } catch (error: unknown) {

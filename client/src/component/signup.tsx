@@ -49,7 +49,6 @@ const SignUp = () => {
       return;
     }
 
-    console.log('Sign Up submitted:', { ...formData, role: selectedRole });
 
     const filteredFormData = {
       username: formData.fullName,

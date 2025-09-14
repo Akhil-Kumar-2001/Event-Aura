@@ -1,16 +1,38 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "../organizer/ui/card"
 import { Button } from "../organizer/ui/button"
 import { Input } from "../organizer/ui/input"
 import { Label } from "../organizer/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "../organizer/ui/avatar"
-import { X, Edit, Wallet } from "lucide-react"
+import { X, Edit, Wallet, LogOut } from "lucide-react"
 import { Textarea } from "./ui/textarea"
+import { useAuthStore } from "../../store/userAuthStore"
+import { useState } from "react"
+
 interface ProfileSectionProps {
   onClose: () => void
 }
 
 export function ProfileSection({ onClose }: ProfileSectionProps) {
+  const { logout, name, email } = useAuthStore()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const success = await logout()
+      if (success) {
+        onClose()
+        console.log('Logged out successfully')
+      } else {
+        console.error('Logout failed')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-md bg-white">
@@ -26,7 +48,9 @@ export function ProfileSection({ onClose }: ProfileSectionProps) {
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="h-20 w-20">
               <AvatarImage src="/professional-organizer-avatar.jpg" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>
+                {name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : 'JD'}
+              </AvatarFallback>
             </Avatar>
             <Button variant="outline" size="sm">
               <Edit className="h-4 w-4 mr-2" />
@@ -37,12 +61,12 @@ export function ProfileSection({ onClose }: ProfileSectionProps) {
           <div className="space-y-4">
             <div>
               <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue="John Doe" />
+              <Input id="name" defaultValue={name || "John Doe"} />
             </div>
 
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="john.doe@example.com" />
+              <Input id="email" type="email" defaultValue={email || "john.doe@example.com"} />
             </div>
 
             <div>
@@ -69,9 +93,26 @@ export function ProfileSection({ onClose }: ProfileSectionProps) {
           </Card>
 
           <div className="flex space-x-2">
-            <Button className="flex-1 bg-teal-600 hover:bg-teal-700 text-white">Save Changes</Button>
-            <Button variant="outline" className="text-red-600 hover:text-red-700 bg-transparent">
-              Logout
+            <Button className="flex-1 bg-teal-600 hover:bg-teal-700 text-white">
+              Save Changes
+            </Button>
+            <Button 
+              variant="outline" 
+              className="text-red-600 hover:text-red-700 bg-transparent hover:bg-red-50"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
+                  Logging out...
+                </>
+              ) : (
+                <>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </>
+              )}
             </Button>
           </div>
         </CardContent>

@@ -33,7 +33,6 @@ export function EventManagement({ selectedEventId, onEventSelect }: EventManagem
         setLoading(true)
         setError(null)
         const fetchedEvents = await getEvents()
-        console.log("[v0] Fetched events:", fetchedEvents)
         setEvents(fetchedEvents.data)
       } catch (err) {
         setError('Failed to load events. Please try again.')
@@ -68,7 +67,6 @@ export function EventManagement({ selectedEventId, onEventSelect }: EventManagem
               purchaseDate: attendee.purchaseDate || new Date().toISOString(),
             })
           })
-          console.log("[v0] Fetched attendees:", attendeesData)
         } catch (err) {
           console.error('Error fetching attendees:', err)
         }
@@ -90,7 +88,6 @@ export function EventManagement({ selectedEventId, onEventSelect }: EventManagem
   }
 
   const handleSaveEvent = (updatedEvent: IEvent) => {
-    console.log("Saving event updates:", updatedEvent)
     const updatedEvents = events.map(event => 
       event._id === updatedEvent._id ? updatedEvent : event
     )
@@ -99,7 +96,6 @@ export function EventManagement({ selectedEventId, onEventSelect }: EventManagem
   }
 
   const handleConfirmDelete = (eventId: string) => {
-    console.log("[v0] Confirming delete for event:", eventId)
     const filteredEvents = events.filter(event => event._id !== eventId)
     setEvents(filteredEvents)
     setDeletingEvent(null)

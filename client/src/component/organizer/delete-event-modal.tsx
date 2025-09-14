@@ -19,12 +19,10 @@ export function DeleteEventModal({ event, onClose, onConfirm }: DeleteEventModal
   const handleDelete = async () => {
     try {
       setIsLoading(true)
-      console.log("[v0] Deleting event:", event._id)
       
       const response = await deleteEvent(event._id)
       
       if (response.success) {
-        console.log("[v0] Event deleted successfully")
         onConfirm(event._id)
       } else {
         console.error("[v0] Failed to delete event")

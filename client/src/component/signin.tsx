@@ -39,12 +39,8 @@ const SignInComponent = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Sign In submitted:", { ...formData, role: selectedRole });
-
     try {
-      console.log("Attempting sign-in with:");
       const response = await Signin(formData, selectedRole);
-      console.log(response, "Sign-in response:");
 
       if (response && response.success) {
         toast.success(response.message || "Sign-in successful!");

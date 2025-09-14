@@ -32,9 +32,6 @@ export const createEvent = async (formData: FormData) => {
 
 export const updateEvent = async (eventId: string, formData: FormData) => {
     try {
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
 
         const response = await apiClient.put(`/organizer/update-event/${eventId}`, formData, {
             headers: {
@@ -73,7 +70,6 @@ export const deleteEvent = async (eventId: string) => {
 
 export const getAttendees = async (eventId: string) => {
     try {
-        console.log("iam called")
         const response = await apiClient.get(`/organizer/get-attendees/${eventId}`);
         return response.data;
     } catch (error: unknown) {
