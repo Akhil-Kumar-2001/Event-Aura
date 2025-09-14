@@ -17,7 +17,7 @@ export class Token implements IToken {
     const accessToken = jwt.sign(
       { userId, role },
       this.JWT_Key,
-      { expiresIn: "15m" }
+      { expiresIn: "30m" }
     );
 
     const refreshToken = jwt.sign(
