@@ -28,6 +28,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
     phone: "",
   });
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"stripe" | "wallet" | "razorpay">("stripe");
+  const [isLoading, setIsLoading] = useState(false);
 
   const totalPrice = (event.ticketPrice * quantity).toFixed(2);
   const processingFee = 3;
@@ -66,17 +67,21 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
       return;
     }
 
-    if (selectedPaymentMethod === "razorpay") {
-      const isRazorpayLoaded = await loadRazorpay();
-      if (!isRazorpayLoaded) {
-        alert("Razorpay SDK failed to load. Please try again.");
-        return;
-      }
+    setIsLoading(true);
 
-      try {
-        const orderData = await createRazorpayOrder(finalTotal,event._id);
+    try {
+      if (selectedPaymentMethod === "razorpay") {
+        const isRazorpayLoaded = await loadRazorpay();
+        if (!isRazorpayLoaded) {
+          alert("Razorpay SDK failed to load. Please try again.");
+          setIsLoading(false);
+          return;
+        }
+
+        const orderData = await createRazorpayOrder(finalTotal, event._id);
         if (!orderData || !orderData.success) {
-          alert("Failed to create Razorpay order.");
+          // alert("Failed to create Razorpay order.");
+          setIsLoading(false);
           return;
         }
         console.log("Razorpay Key:", import.meta.env.VITE_RAZORPAY_KEY_ID);
@@ -96,6 +101,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
               paymentId: response.razorpay_payment_id
             };
             const result = await confirmPayment(confirmData);
+            setIsLoading(false);
             if (result && result.success) {
               onPurchaseComplete("razorpay");
             } else {
@@ -114,22 +120,24 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
 
         const rzp = new (window as any).Razorpay(options);
         rzp.open();
-      } catch (error) {
-        console.error("Razorpay error:", error);
-        alert("Payment failed. Please try again.");
+      } else if (selectedPaymentMethod === "wallet") {
+        const data = {
+          eventId: event._id,
+          quantity,
+          price: finalTotal
+        };
+        const response = await purchaseTicket(data);
+        setIsLoading(false);
+        if (response && response.success) {
+          onPurchaseComplete(selectedPaymentMethod);
+        } else {
+          alert("Payment failed. Please try again.");
+        }
       }
-    } else if (selectedPaymentMethod === "wallet") {
-      const data = {
-        eventId: event._id,
-        quantity,
-        price: finalTotal
-      };
-      const response = await purchaseTicket(data);
-      if (response && response.success) {
-        onPurchaseComplete(selectedPaymentMethod);
-      } else {
-        alert("Payment failed. Please try again.");
-      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Payment failed. Please try again.");
+      setIsLoading(false);
     }
   };
 
@@ -223,7 +231,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
 
               <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Method</h2>
               <div className="space-y-3 mb-8">
-                <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                {/* <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -234,7 +242,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
                   />
                   <span className="w-5 h-5 mr-3 bg-teal-600 rounded"></span>
                   <span className="text-gray-700">Wallet Balance</span>
-                </label>
+                </label> */}
                 <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="radio"
@@ -276,9 +284,36 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
 
                 <button
                   onClick={handleConfirmPurchase}
-                  className="w-full bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors font-semibold text-lg mt-6"
+                  disabled={isLoading}
+                  className={`w-full bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors font-semibold text-lg mt-6 flex items-center justify-center ${
+                    isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
-                  Confirm Purchase
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 mr-3 text-white"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    "Confirm Purchase"
+                  )}
                 </button>
                 <div className="text-center text-sm text-gray-500 mt-4">
                   <CreditCard className="h-4 w-4 inline mr-1" />

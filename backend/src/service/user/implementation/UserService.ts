@@ -46,16 +46,16 @@ class UserService implements IUserService {
         } catch (error) {
             console.error("Error in purchaseTicket:", error);
             if (error instanceof AppError) {
-                throw error; 
+                throw error;
             }
             throw new AppError("Failed to purchase ticket", STATUS_CODES.INTERNAL_SERVER_ERROR);
         }
     }
 
 
-    async createRazorpayOrder(amount: number,eventId:string,userId:string): Promise<IRazorpayOrder> {
+    async createRazorpayOrder(amount: number, eventId: string, userId: string): Promise<IRazorpayOrder> {
         try {
-            const ticketExist = await this._userRepository.findUserTicket(eventId,userId);
+            const ticketExist = await this._userRepository.findUserTicket(eventId, userId);
             if (ticketExist) {
                 throw new AppError("Ticket already purchased for this event", STATUS_CODES.CONFLICT);
             }
@@ -67,6 +67,9 @@ class UserService implements IUserService {
             const order = await razorpay.orders.create(options);
             return order as IRazorpayOrder;
         } catch (error) {
+            if (error instanceof AppError) {
+                throw error; // Rethrow the original AppError
+            }
             throw new AppError("Failed to create order", STATUS_CODES.INTERNAL_SERVER_ERROR);
         }
     }
