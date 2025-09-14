@@ -39,7 +39,7 @@ class AuthController implements IAuthController {
                     res
                         .status(STATUS_CODES.OK)
                         .json({
-                            success: true, message: "Sign-in successful", data: { accessToken, user }
+                            success: true, message: "Sign-in successful", data: { accessToken, user:{ email: user.email, id: user._id, name: user.username } }
                         });
                     return;
                 } else {

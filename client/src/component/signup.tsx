@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { User, Crown, Mail, Lock, Eye, EyeOff, Calendar, ArrowRight, ArrowLeft, UserPlus } from 'lucide-react';
 import { Signup } from '../service/auth/authApi';
 import { toast } from 'react-toastify'
+import { useAuthStore } from "../store/userAuthStore"; // Import your auth store
 import { useNavigate } from 'react-router-dom';
 const SignUp = () => {
-  const [selectedRole, setSelectedRole] = useState('attendee');
+  const [selectedRole, setSelectedRole] = useState<"attendee" | "organizer">('attendee');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -16,7 +17,17 @@ const SignUp = () => {
   });
 
   const navigate = useNavigate();
+  const { setAuth, isAuthenticated, role } = useAuthStore();
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (role === "organizer") {
+        navigate("/organizer/dashboard", { replace: true });
+      } else if (role === "attendee") {
+        navigate("/", { replace: true });
+      }
+    }
+  }, [isAuthenticated, role, navigate]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -47,8 +58,13 @@ const SignUp = () => {
     };
     try {
       const response = await Signup(filteredFormData, selectedRole)
-      if (response &&response?.success) {
+      if (response && response?.success) {
         toast.success(response.message);
+        setAuth(true, {
+          user: response.data.user,
+          accessToken: response.data.accessToken,
+          role: selectedRole
+        });
         if (selectedRole === "organizer") {
           navigate("/organizer/dashboard");
         } else {
@@ -92,8 +108,8 @@ const SignUp = () => {
                   type="button"
                   onClick={() => setSelectedRole('attendee')}
                   className={`p-4 rounded-xl border-2 transition-all duration-300 ${selectedRole === 'attendee'
-                      ? 'border-teal-500 bg-teal-50 text-teal-700'
-                      : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
+                    ? 'border-teal-500 bg-teal-50 text-teal-700'
+                    : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
                     }`}
                 >
                   <User className="w-6 h-6 mx-auto mb-2" />
@@ -104,8 +120,8 @@ const SignUp = () => {
                   type="button"
                   onClick={() => setSelectedRole('organizer')}
                   className={`p-4 rounded-xl border-2 transition-all duration-300 ${selectedRole === 'organizer'
-                      ? 'border-teal-500 bg-teal-50 text-teal-700'
-                      : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
+                    ? 'border-teal-500 bg-teal-50 text-teal-700'
+                    : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
                     }`}
                 >
                   <Crown className="w-6 h-6 mx-auto mb-2" />
@@ -241,8 +257,8 @@ const SignUp = () => {
               onClick={handleSubmit}
               disabled={!agreedToTerms}
               className={`w-full font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${agreedToTerms
-                  ? 'bg-teal-600 hover:bg-teal-700 text-white hover:shadow-xl transform hover:-translate-y-0.5'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ? 'bg-teal-600 hover:bg-teal-700 text-white hover:shadow-xl transform hover:-translate-y-0.5'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
             >
               Create Account

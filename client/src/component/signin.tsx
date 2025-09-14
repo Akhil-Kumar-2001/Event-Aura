@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { User, Crown, Mail, Lock, Eye, EyeOff, Calendar, ArrowRight } from "lucide-react";
 import { toast } from "react-toastify";
 import { Signin } from "../service/auth/authApi";
-import { useAuthStore } from "../store/userAuthStore"; // Import your auth store
+import { useAuthStore } from "../store/userAuthStore"; 
 
 const SignInComponent = () => {
   const [selectedRole, setSelectedRole] = useState<"attendee" | "organizer">(
