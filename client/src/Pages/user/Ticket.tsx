@@ -30,7 +30,6 @@ export default function MyTicketsPage() {
 
   const formatTime = (timeString: string) => {
     if (!timeString) return 'Time TBD'
-    // If time is in HH:MM format, convert to 12-hour format
     const [hours, minutes] = timeString.split(':')
     const hour = parseInt(hours)
     const ampm = hour >= 12 ? 'PM' : 'AM'
@@ -249,70 +248,108 @@ export default function MyTicketsPage() {
 
       {/* Ticket Details Modal */}
       {selectedTicket && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-gray-200">
+            <div className="p-6 bg-gradient-to-r from-teal-50 to-blue-50 rounded-t-2xl relative">
+              <h3 className="text-2xl font-bold text-gray-900">Ticket Details</h3>
+              <button
+                onClick={() => setSelectedTicket(null)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Ticket Details</h3>
-                <button
-                  onClick={() => setSelectedTicket(null)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Event</label>
-                  <p className="text-gray-900">{selectedTicket.eventTitle}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Venue</label>
-                  <p className="text-gray-900">{selectedTicket.eventVenue}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Address</label>
-                  <p className="text-gray-900 text-sm">{selectedTicket.eventAddress}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date & Time</label>
-                  <p className="text-gray-900">{formatDate(selectedTicket.eventDate)} at {formatTime(selectedTicket.eventTime)}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Ticket Number</label>
-                  <p className="text-gray-900 font-mono">{selectedTicket.ticketNumber}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Quantity</label>
-                  <p className="text-gray-900">{selectedTicket.quantity}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Attendee</label>
-                  <p className="text-gray-900">{user.name}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <p className="text-gray-900">{user.email}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Total Price Paid</label>
-                  <p className="text-gray-900 font-semibold">₹{selectedTicket.price}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Status</label>
-                  <p className={`font-semibold ${
-                    selectedTicket.status === "confirmed" ? "text-green-600" : "text-red-600"
-                  }`}>
+              <div className="space-y-6">
+                {/* Event Title and Status */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Ticket className="h-5 w-5 text-teal-600" />
+                    <h4 className="text-xl font-semibold text-gray-900">{selectedTicket.eventTitle}</h4>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedTicket.status === "confirmed" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                    }`}
+                  >
                     {selectedTicket.status === "confirmed" ? "Confirmed" : "Cancelled"}
-                  </p>
+                  </span>
+                </div>
+
+                {/* Event Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <div className="flex items-center space-x-2 text-gray-600 mb-2">
+                      <MapPin className="h-4 w-4 text-teal-600" />
+                      <span className="font-medium">Venue</span>
+                    </div>
+                    <p className="text-gray-900">{selectedTicket.eventVenue}</p>
+                    <p className="text-sm text-gray-500">{selectedTicket.eventAddress}</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2 text-gray-600 mb-2">
+                      <Calendar className="h-4 w-4 text-teal-600" />
+                      <span className="font-medium">Date & Time</span>
+                    </div>
+                    <p className="text-gray-900">{formatDate(selectedTicket.eventDate)}</p>
+                    <p className="text-sm text-gray-500">{formatTime(selectedTicket.eventTime)}</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2 text-gray-600 mb-2">
+                      <Ticket className="h-4 w-4 text-teal-600" />
+                      <span className="font-medium">Ticket Number</span>
+                    </div>
+                    <p className="text-gray-900 font-mono">{selectedTicket.ticketNumber}</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2 text-gray-600 mb-2">
+                      <Ticket className="h-4 w-4 text-teal-600" />
+                      <span className="font-medium">Quantity</span>
+                    </div>
+                    <p className="text-gray-900">{selectedTicket.quantity}</p>
+                  </div>
+                </div>
+
+                {/* Attendee Info */}
+                <div className="border-t pt-4">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-3">Attendee Information</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <span className="block text-sm font-medium text-gray-600">Name</span>
+                      <p className="text-gray-900">{user.name}</p>
+                    </div>
+                    <div>
+                      <span className="block text-sm font-medium text-gray-600">Email</span>
+                      <p className="text-gray-900">{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price and Status */}
+                <div className="border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="block text-sm font-medium text-gray-600">Total Price Paid</span>
+                      <p className="text-2xl font-bold text-teal-600">₹{selectedTicket.price}</p>
+                    </div>
+                    <div>
+                      <span className="block text-sm font-medium text-gray-600">Status</span>
+                      <p
+                        className={`font-semibold ${
+                          selectedTicket.status === "confirmed" ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {selectedTicket.status === "confirmed" ? "Confirmed" : "Cancelled"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div className="mt-6 pt-4 border-t">
                 <button
                   onClick={() => setSelectedTicket(null)}
-                  className="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition-colors"
+                  className="w-full bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium"
                 >
                   Close
                 </button>

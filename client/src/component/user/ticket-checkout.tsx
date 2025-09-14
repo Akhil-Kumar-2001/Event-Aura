@@ -8,7 +8,7 @@ interface CheckoutPageProps {
   event: IEvent;
   onClose: () => void;
   onBackToDetails?: () => void;
-  onPurchaseComplete: (paymentMethod: "wallet" | "stripe" | "razorpay") => void;
+  onPurchaseComplete: (paymentMethod: "wallet" | "razorpay") => void;
 }
 
 interface UserDetails {
@@ -27,7 +27,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
     email: email || "",
     phone: "",
   });
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"stripe" | "wallet" | "razorpay">("stripe");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"stripe" | "wallet" | "razorpay" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const totalPrice = (event.ticketPrice * quantity).toFixed(2);
@@ -67,6 +67,11 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
       return;
     }
 
+    if (!selectedPaymentMethod) {
+      alert("Please select a payment method.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -80,7 +85,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
 
         const orderData = await createRazorpayOrder(finalTotal, event._id);
         if (!orderData || !orderData.success) {
-          // alert("Failed to create Razorpay order.");
+          // alert(orderData?.message || "Failed to create Razorpay order.");
           setIsLoading(false);
           return;
         }
@@ -131,12 +136,12 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
         if (response && response.success) {
           onPurchaseComplete(selectedPaymentMethod);
         } else {
-          alert("Payment failed. Please try again.");
+          alert(response?.message || "Payment failed. Please try again.");
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
-      alert("Payment failed. Please try again.");
+      alert(error.message || "Payment failed. Please try again.");
       setIsLoading(false);
     }
   };
@@ -231,7 +236,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
 
               <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Method</h2>
               <div className="space-y-3 mb-8">
-                {/* <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -242,7 +247,7 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
                   />
                   <span className="w-5 h-5 mr-3 bg-teal-600 rounded"></span>
                   <span className="text-gray-700">Wallet Balance</span>
-                </label> */}
+                </label>
                 <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="radio"
@@ -284,9 +289,9 @@ export default function CheckoutPage({ event, onClose, onBackToDetails, onPurcha
 
                 <button
                   onClick={handleConfirmPurchase}
-                  disabled={isLoading}
+                  disabled={isLoading || !selectedPaymentMethod}
                   className={`w-full bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors font-semibold text-lg mt-6 flex items-center justify-center ${
-                    isLoading ? "opacity-50 cursor-not-allowed" : ""
+                    isLoading || !selectedPaymentMethod ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
                   {isLoading ? (

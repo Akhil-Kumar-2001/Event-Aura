@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import TicketCheckout from "../../component/user/ticket-checkout"
 import Header from "../../component/user/header"
 import Footer from "../../component/user/footer"
+import SuccessModal from "../../component/user/successModal" // Import the new modal component
 import { useAuthStore } from "../../store/userAuthStore"
 import { useEventStore } from "../../store/eventStore"
 import type { IEvent } from "../../Types/basicTypes"
@@ -14,6 +15,8 @@ export default function EventCheckoutPage() {
   const { events } = useEventStore()
   const [event, setEvent] = useState<IEvent | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<"wallet" | "razorpay" | null>(null)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -47,11 +50,19 @@ export default function EventCheckoutPage() {
     }
   }
 
-  const handlePurchaseComplete = (paymentMethod: "wallet" | "stripe" | "razorpay") => {
-    navigate('/', { replace: true })
-    setTimeout(() => {
-      alert(`Ticket purchased successfully using ${paymentMethod === "wallet" ? "wallet" : paymentMethod}!`)
-    }, 100)
+  const handlePurchaseComplete = (paymentMethod: "wallet" | "razorpay") => {
+    setPaymentMethod(paymentMethod)
+    setShowSuccessModal(true)
+  }
+
+  const handleGoToTickets = () => {
+    setShowSuccessModal(false)
+    navigate('/tickets')
+  }
+
+  const handleGoToHome = () => {
+    setShowSuccessModal(false)
+    navigate('/')
   }
 
   if (loading) {
@@ -92,6 +103,14 @@ export default function EventCheckoutPage() {
         onPurchaseComplete={handlePurchaseComplete}
       />
       <Footer />
+      
+      {/* Success Modal Component */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        paymentMethod={paymentMethod}
+        onGoToTickets={handleGoToTickets}
+        onGoToHome={handleGoToHome}
+      />
     </div>
   )
 }
