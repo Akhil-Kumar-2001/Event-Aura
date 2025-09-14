@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    /* File Layout */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Environment Settings */
+    "module": "commonjs",          // CommonJS is safe for Node/Express
+    "target": "es2019",            // Good balance for Node.js support
+    "lib": ["esnext"],             // Enable latest JS features
+    "types": ["node", "express"],  // Include type definitions
+
+    /* Outputs */
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    /* Strict Type Checking */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* Module Resolution */
+    "esModuleInterop": true,       // Allow default imports for CommonJS modules
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+
+    /* Other */
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],  // Only compile files inside src/
+  "exclude": ["node_modules", "dist"]
+}
