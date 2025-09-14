@@ -12,6 +12,7 @@ const SignInComponent = () => {
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false); // New loading state
 
   const navigate = useNavigate();
   const { setAuth, isAuthenticated, role } = useAuthStore();
@@ -35,6 +36,7 @@ const SignInComponent = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true); // Set loading to true when submitting
     try {
       const response = await Signin(formData, selectedRole);
       if (response && response.success) {
@@ -55,6 +57,8 @@ const SignInComponent = () => {
     } catch (error) {
       console.error("Sign-in error:", error);
       toast.error("Sign-in failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false); // Reset loading state after completion
     }
   };
 
@@ -63,14 +67,14 @@ const SignInComponent = () => {
       <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-xl shadow-2xl overflow-hidden">
         {/* Sidebar Branding Panel */}
         <div className="md:w-1/3 bg-teal-600 text-white p-8 flex flex-col justify-between items-center">
-          <div className="text-center pt-12"> {/* Added pt-12 to move text down */}
+          <div className="text-center pt-12">
             <div className="flex items-center justify-center gap-3 mb-6">
               <Calendar className="w-10 h-10 animate-spin-slow" />
               <h1 className="text-3xl font-extrabold">Event Aura</h1>
             </div>
             <p className="text-teal-100 text-lg">Welcome back to your event journey!</p>
           </div>
-          <div className="text-center text-sm opacity-80 pt-8"> {/* Added pt-8 to move terms down */}
+          <div className="text-center text-sm opacity-80 pt-8">
             <p>By signing in, you agree to our</p>
             <a href="/terms" className="underline hover:text-teal-200">Terms of Service</a> and{' '}
             <a href="/privacy" className="underline hover:text-teal-200">Privacy Policy</a>
@@ -168,13 +172,44 @@ const SignInComponent = () => {
               </button>
             </div>
 
-            {/* Sign In Button */}
+            {/* Sign In Button with Loading Effect */}
             <button
               type="submit"
-              className="w-full py-3 px-6 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              disabled={isLoading}
+              className={`w-full py-3 px-6 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                isLoading ? 'opacity-75 cursor-not-allowed' : ''
+              }`}
             >
-              Sign In
-              <ArrowRight className="w-5 h-5" />
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
 
             {/* Switch to Sign Up */}
