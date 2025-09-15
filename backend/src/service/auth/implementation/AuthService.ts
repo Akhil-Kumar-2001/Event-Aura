@@ -16,17 +16,19 @@ class AuthService implements IAuthService {
 
     async sigup(username: string, email: string, password: string, role: string): Promise<AuthResponse | null> {
         try {
-            const validation = SignupValidation.parse({ username, email, password, role });
+            const validation = SignupValidation.safeParse({ username, email, password, role });
+            if(!validation.success){
+                console.log(validation.error.issues)
+                throw new AppError(validation.error.issues[0]?.message!,400)
+            }
 
             const existingUser = await this._authRepository.findByEmail(email);
 
             if (existingUser) {
                 throw new AppError("User with this email already exists.", STATUS_CODES.BAD_REQUEST);
             }
-
             const hashpassword = await PasswordUtils.passwordHash(password);
-            const newUser = await this._authRepository.create({ ...validation, password: hashpassword });
-            
+            const newUser = await this._authRepository.create({ ...validation.data, password: hashpassword });
             if (newUser) {
                 const tokenInstance = new Token();
                 if (!newUser._id || !newUser.role) {
@@ -38,6 +40,7 @@ class AuthService implements IAuthService {
             }
             throw new AppError("User creation failed", STATUS_CODES.INTERNAL_SERVER_ERROR);
         } catch (error) {
+
             throw error;
         }
     }

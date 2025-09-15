@@ -20,7 +20,7 @@ class OrganizerService implements IOrganizerService {
     async createEvent(data: IEventCreation): Promise<IEventDto> {
         const coverImageId = randomUUID();
 
-        EventValidation.parse(data)
+        EventValidation.safeParse(data)
         const uploadImage = (): Promise<{ url: string; public_id: string }> => {
             return new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { User, Crown, Mail, Lock, Eye, EyeOff, Calendar, ArrowRight, ArrowLeft, UserPlus } from 'lucide-react';
+import { User, Crown, Mail, Lock, Eye, EyeOff, Calendar, ArrowRight, ArrowLeft, UserPlus, Loader2 } from 'lucide-react';
 import { Signup } from '../service/auth/authApi';
 import { toast } from 'react-toastify';
 import { useAuthStore } from "../store/userAuthStore";
@@ -10,6 +10,7 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -68,6 +69,7 @@ const SignUp = () => {
       toast.error('Please fill all fields correctly and agree to the terms.');
       return;
     }
+    setIsLoading(true);
     const filteredFormData = {
       username: formData.fullName,
       email: formData.email,
@@ -91,6 +93,8 @@ const SignUp = () => {
     } catch (error) {
       console.error("Error during signup:", error);
       toast.error("Signup failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,14 +103,14 @@ const SignUp = () => {
       <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-xl shadow-2xl overflow-hidden">
         {/* Sidebar Branding Panel */}
         <div className="md:w-1/3 bg-teal-600 text-white p-8 flex flex-col justify-between items-center">
-          <div className="text-center pt-12"> {/* Added pt-12 to move text down */}
+          <div className="text-center pt-12">
             <div className="flex items-center justify-center gap-3 mb-6">
               <Calendar className="w-10 h-10 animate-spin-slow" />
               <h1 className="text-3xl font-extrabold">Event Aura</h1>
             </div>
             <p className="text-teal-100 text-lg">Unleash your event experience with us!</p>
           </div>
-          <div className="text-center text-sm opacity-80 pt-8"> {/* Added pt-8 to move terms down */}
+          <div className="text-center text-sm opacity-80 pt-8">
             <p>By creating an account, you agree to our</p>
             <a href="/terms" className="underline hover:text-teal-200">Terms of Service</a> and{' '}
             <a href="/privacy" className="underline hover:text-teal-200">Privacy Policy</a>
@@ -128,7 +132,7 @@ const SignUp = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedRole('attendee')}
-                  className={`flex-1 py-4 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-1 ${
+                  className={`flex-1 py-4 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
                     selectedRole === 'attendee'
                       ? 'bg-teal-100 text-teal-800 border-2 border-teal-500 shadow-md'
                       : 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:bg-teal-50'
@@ -140,7 +144,7 @@ const SignUp = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedRole('organizer')}
-                  className={`flex-1 py-4 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-1 ${
+                  className={`flex-1 py-4 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
                     selectedRole === 'organizer'
                       ? 'bg-teal-100 text-teal-800 border-2 border-teal-500 shadow-md'
                       : 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:bg-teal-50'
@@ -210,6 +214,7 @@ const SignUp = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3 text-teal-400 hover:text-teal-600"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -238,6 +243,7 @@ const SignUp = () => {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-3 text-teal-400 hover:text-teal-600"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                 >
                   {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -268,15 +274,27 @@ const SignUp = () => {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!isFormValid()}
-              className={`w-full py-3 px-6 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300 ${
-                isFormValid()
+              disabled={!isFormValid() || isLoading}
+              aria-disabled={!isFormValid() || isLoading}
+              aria-busy={isLoading}
+              aria-label={isLoading ? 'Creating account, please wait' : 'Create account'}
+              className={`w-full py-3 px-6 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                isFormValid() && !isLoading
                   ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                  : 'bg-teal-200 text-teal-400 cursor-not-allowed'
+                  : 'bg-teal-200 text-teal-400 cursor-not-allowed opacity-75'
               }`}
             >
-              Create Account
-              <ArrowRight className="w-5 h-5" />
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                  <span className="sr-only">Creating account, please wait</span>
+                </>
+              ) : (
+                <>
+                  Create Account
+                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                </>
+              )}
             </button>
 
             {/* Link to Sign In */}
