@@ -32,16 +32,21 @@ const SignUp = () => {
   }, [isAuthenticated, role, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: name === 'fullName' ? value.replace(/^\s+/, '') : value // Remove leading spaces for fullName
     });
   };
 
   // Validation functions
   const isNameValid = (name: string) => {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      return false; // Empty or only spaces
+    }
     const nameRegex = /^[a-zA-Z\s]{2,50}$/;
-    return nameRegex.test(name.trim());
+    return nameRegex.test(trimmedName);
   };
 
   const isEmailValid = (email: string) => {
@@ -71,7 +76,7 @@ const SignUp = () => {
     }
     setIsLoading(true);
     const filteredFormData = {
-      username: formData.fullName,
+      username: formData.fullName.trim(), // Trim spaces before sending
       email: formData.email,
       password: formData.password
     };
@@ -169,8 +174,12 @@ const SignUp = () => {
                 className="w-full mt-2 p-3 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-300 bg-teal-50/50"
                 required
               />
-              {!isNameValid(formData.fullName) && formData.fullName && (
-                <div className="text-xs text-red-500 mt-1">Name must be 2-50 characters long and contain only letters and spaces</div>
+              {formData.fullName && !isNameValid(formData.fullName) && (
+                <div className="text-xs text-red-500 mt-1">
+                  {formData.fullName.trim() === ''
+                    ? 'Name cannot be empty or contain only spaces'
+                    : 'Name must be 2-50 characters long and contain only letters and spaces'}
+                </div>
               )}
             </div>
 
