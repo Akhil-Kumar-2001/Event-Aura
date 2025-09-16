@@ -16,7 +16,7 @@ interface AttendeeState {
   attendees: IAttendee[];
   addAttendee: (attendee: IAttendee) => void;
   removeAttendee: (id: string) => void;
-  clearAttendees: () => void; // Add this method
+  clearAttendees: () => void;
 }
 
 export const useAttendeeStore = create<AttendeeState>()(
@@ -42,7 +42,6 @@ export const useAttendeeStore = create<AttendeeState>()(
           attendees: state.attendees.filter((a) => a.id !== id),
         })),
 
-      // Add the clearAttendees method
       clearAttendees: () =>
         set(() => ({
           attendees: [],

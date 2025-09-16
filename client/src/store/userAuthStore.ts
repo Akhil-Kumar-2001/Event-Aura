@@ -1,17 +1,19 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { apiClient } from '../service/axiosInstance'
+import { useEventStore } from './eventStore'
+import { useAttendeeStore } from './attendeeStore'
 
 interface User {
   email: string
   id: string
-  name: string 
+  name: string
 }
 
 interface AuthState {
   isAuthenticated: boolean
   email: string | null
-  name: string | null 
+  name: string | null
   user: User | null
   accessToken: string | null
   role: 'attendee' | 'organizer' | null
@@ -28,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       role: null,
-      
+
       setAuth: (auth, userData) => {
         if (auth && userData) {
           set({
@@ -48,25 +50,27 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await apiClient.post('/auth/logout')
           if (response.data.success) {
-            set({ 
-              isAuthenticated: false, 
+            set({
+              isAuthenticated: false,
               email: null,
               name: null,
-              user: null, 
+              user: null,
               accessToken: null,
-              role: null 
+              role: null
             })
-            return true // Indicate successful logout
+            useEventStore.getState().clearEvents()
+            useAttendeeStore.getState().clearAttendees()
+            return true 
           }
-          return false // Indicate failed logout
+          return false 
         } catch (error) {
           console.error('Logout API call failed:', error)
-          return false // Indicate failed logout
+          return false 
         }
       },
     }),
     {
-      name: 'auth-store', 
+      name: 'auth-store',
     }
   )
 )
